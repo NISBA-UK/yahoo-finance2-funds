@@ -60,8 +60,8 @@ async function main() {
         const quote = await yahooFinance.quote(ticker);
         const currentPrice = quote.regularMarketPrice;
 
-        const price1M = await getHistoricalPrice(ticker, date1M);
-        const price1Y = await getHistoricalPrice(ticker, date1Y);
+        const price1M = await getHistoricalPrice(yahooFinance, ticker, date1M);
+        const price1Y = await getHistoricalPrice(yahooFinance, ticker, date1Y);
 
         const calcPct = (c, p) =>
           p ? parseFloat((((c - p) / p) * 100).toFixed(2)) : null;

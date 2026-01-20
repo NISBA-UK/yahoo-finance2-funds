@@ -1,4 +1,8 @@
-export default async function getHistoricalPrice(symbol, targetDate) {
+export default async function getHistoricalPrice(
+  yahooFinance,
+  symbol,
+  targetDate
+) {
   const p1 = new Date(targetDate);
   p1.setDate(p1.getDate() - 5);
   const p2 = new Date(targetDate);
@@ -19,7 +23,8 @@ export default async function getHistoricalPrice(symbol, targetDate) {
         : p
     );
     return closest.close;
-  } catch {
+  } catch (error) {
+    console.error(`Historical fetch error for ${symbol}:`, error.message);
     return null;
   }
 }
