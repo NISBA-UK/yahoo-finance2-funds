@@ -1,6 +1,4 @@
-import { loadEnvFile } from "node:process";
-loadEnvFile();
-
+import 'dotenv/config'
 import YahooFinance from "yahoo-finance2";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import sendErrorEmail from "./utils/sendErrorEmail.js";
@@ -94,7 +92,6 @@ async function main() {
         );
       }
     }
-
     // --- PHASE 3: S3 UPLOAD ---
     await s3Client.send(
       new PutObjectCommand({

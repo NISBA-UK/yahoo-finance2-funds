@@ -1,6 +1,3 @@
-import { loadEnvFile } from "node:process";
-loadEnvFile();
-
 export const config = {
   dataUrl: process.env.DATA_URL,
   s3Bucket: process.env.S3_BUCKET_NAME,

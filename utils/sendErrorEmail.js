@@ -3,7 +3,6 @@ import { config } from "../config.js";
 
 export default async function sendErrorEmail(errorMessage) {
   if (!config.emailUser || !config.emailPass) return;
-
   const transporter = nodemailer.createTransport({
     host: config.emailHost,
     port: config.emailPort,
@@ -13,7 +12,7 @@ export default async function sendErrorEmail(errorMessage) {
 
   try {
     await transporter.sendMail({
-      from: `"Scraper Alert" <${config.emailUser}>`,
+      from: `"Scraper Alert" <${config.emailUser}@nisba.co.uk>`,
       to: config.emailTo,
       subject: "🚨 Financial Scraper Failure",
       text: `The scraper failed at ${new Date().toISOString()}.\n\nError: ${errorMessage}`,
