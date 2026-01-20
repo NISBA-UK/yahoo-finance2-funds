@@ -1,3 +1,6 @@
+import { loadEnvFile } from "node:process";
+loadEnvFile();
+
 import YahooFinance from "yahoo-finance2";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import sendErrorEmail from "./utils/sendErrorEmail.js";
@@ -111,3 +114,6 @@ async function main() {
 }
 
 main();
+
+const TIME_DELAY = 60 * 60 * 1000;
+setInterval(main, TIME_DELAY);

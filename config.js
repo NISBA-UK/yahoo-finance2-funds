@@ -1,20 +1,5 @@
 import { loadEnvFile } from "node:process";
-import { join } from "node:path";
-
-// 1. Try to load from /app (Coolify/Docker path)
-// 2. Fallback to loading from the current directory (Local Dev)
-try {
-  loadEnvFile(join("/app", ".env"));
-} catch (error) {
-  try {
-    // If /app/.env fails, try loading .env from where you ran the command
-    loadEnvFile();
-  } catch (localError) {
-    // If both fail, we don't crash. Coolify injects vars via process.env directly.
-    if (localError.code !== "ENOENT") throw localError;
-    console.info("ℹ️ No .env file found; using system environment variables.");
-  }
-}
+loadEnvFile();
 
 export const config = {
   dataUrl: process.env.DATA_URL,
