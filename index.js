@@ -7,16 +7,12 @@ import sendErrorEmail from "./utils/sendErrorEmail.js";
 import getHistoricalPrice from "./utils/getHistoricalPrice.js";
 import { config } from "./config.js";
 
-// Initialize Yahoo Finance v3 with suppressed notices
 const yahooFinance = new YahooFinance({
   suppressNotices: ["yahooSurvey", "ripHistorical"],
 });
 
 const s3Client = new S3Client({ region: config.awsRegion });
 
-/**
- * Main Scraper Execution
- */
 async function main() {
   try {
     let currentPage = 1;
@@ -44,13 +40,10 @@ async function main() {
       currentPage++;
     } while (currentPage <= totalPages);
 
-    // Deduplicate tickers
-    const tickers = [
-      ...new Set(allItems.map((i) => i.yahooFinanceTicker)),
-    ].filter(Boolean);
-    console.log(
-      `Crawl complete. Found ${tickers.length} unique tickers across all pages.`
-    );
+    // Filter out items without a valid Yahoo ticker
+    const validItems = allItems.filter((item) => item.yahooFinanceTicker);
+
+    console.log(`Crawl complete. Found ${validItems.length} items to process.`);
 
     // --- PHASE 2: PROCESSING ---
     const results = [];
@@ -59,7 +52,8 @@ async function main() {
     const date1Y = new Date();
     date1Y.setFullYear(date1Y.getFullYear() - 1);
 
-    for (const ticker of tickers) {
+    for (const item of validItems) {
+      const ticker = item.yahooFinanceTicker;
       try {
         console.log(`Querying Yahoo: ${ticker}`);
 
@@ -72,14 +66,27 @@ async function main() {
         const calcPct = (c, p) =>
           p ? parseFloat((((c - p) / p) * 100).toFixed(2)) : null;
 
+        // Merge original item data with Yahoo Finance results
         results.push({
+          fundName: item.fundName,
+          assetClass: item.assetClass,
+          currency: item.currency,
           yahooFinanceTicker: ticker,
+          ticker: item.ticker,
+          fee: item.fee,
+          geoFocus: item.geoFocus,
+          accumulationOrIncome: item.accumulationOrIncome,
+          dividendPurification: item.dividendPurification,
+          activeOrPassive: item.activeOrPassive,
+          investmentType: item.investmentType, // API uses 'investmentType' for ETF/Fund
+          currencyDenomination: item.currencyDenomination,
+          brokerAvailability: item.brokerAvailability,
           price: currentPrice,
           oneYear: calcPct(currentPrice, price1Y),
           oneMonth: calcPct(currentPrice, price1M),
+          updatedAt: new Date().toISOString(),
         });
 
-        // Respect rate limits
         await new Promise((r) => setTimeout(r, 200));
       } catch (tickerErr) {
         console.warn(
