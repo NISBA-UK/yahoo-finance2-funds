@@ -114,3 +114,6 @@ async function main() {
 }
 
 main();
+
+const TIME_DELAY = 60 * 60 * 1000;
+setInterval(main, TIME_DELAY);
