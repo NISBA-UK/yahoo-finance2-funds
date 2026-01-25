@@ -21,7 +21,7 @@ async function main() {
     console.log(`Starting pagination crawl at: ${config.dataUrl}`);
 
     do {
-      const url = new URL(config.dataUrl);
+      const url = new URL(`${config.dataUrl}/collections/fund/records`);
       url.searchParams.append("page", currentPage.toString());
 
       console.log(`Fetching page ${currentPage}...`);
@@ -67,6 +67,7 @@ async function main() {
         // Merge original item data with Yahoo Finance results
         results.push({
           fundName: item.fundName,
+          fundImage: item.fundImage ? `${config.dataUrl}/files/${item.collectionId}/${item.id}/${item.fundImage}` : null,
           assetClass: item.assetClass,
           currency: item.currency,
           yahooFinanceTicker: ticker,
