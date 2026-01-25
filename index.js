@@ -4,6 +4,7 @@ import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import sendErrorEmail from "./utils/sendErrorEmail.js";
 import getHistoricalPrice from "./utils/getHistoricalPrice.js";
 import { config } from "./config.js";
+import getFundImage from './utils/getFundImage.js';
 
 const yahooFinance = new YahooFinance({
   suppressNotices: ["yahooSurvey", "ripHistorical"],
@@ -63,11 +64,11 @@ async function main() {
 
         const calcPct = (c, p) =>
           p ? parseFloat((((c - p) / p) * 100).toFixed(2)) : null;
+        const fundImageData = await getFundImage(item.fundImage);
 
-        // Merge original item data with Yahoo Finance results
         results.push({
           fundName: item.fundName,
-          fundImage: item.fundImage ? `${config.dataUrl}/files/${item.collectionId}/${item.id}/${item.fundImage}` : null,
+          fundImage: item.fundImage ? `${config.dataUrl}/files/${fundImageData}` : null,
           assetClass: item.assetClass,
           currency: item.currency,
           yahooFinanceTicker: ticker,
