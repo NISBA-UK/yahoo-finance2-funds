@@ -1,10 +1,12 @@
-import 'dotenv/config'
+import "dotenv/config";
 import YahooFinance from "yahoo-finance2";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import sendErrorEmail from "./utils/sendErrorEmail.js";
 import getHistoricalPrice from "./utils/getHistoricalPrice.js";
 import { config } from "./config.js";
-import getFundImage from './utils/getFundImage.js';
+import getFundImage from "./utils/getFundImage.js";
+import calculateGbpUsdReturn from "./utils/calculateGbpUsdReturn.js";
+import getGbpUsdReturn from "./utils/getGBPUSDReturn.js";
 
 const yahooFinance = new YahooFinance({
   suppressNotices: ["yahooSurvey", "ripHistorical"],
@@ -51,6 +53,9 @@ async function main() {
     const date1Y = new Date();
     date1Y.setFullYear(date1Y.getFullYear() - 1);
 
+    const gbpUsdReturn1Y = await getGbpUsdReturn(date1Y);
+    const gbpUsdReturn1M = await getGbpUsdReturn(date1M);
+
     for (const item of validItems) {
       const ticker = item.yahooFinanceTicker;
       try {
@@ -65,10 +70,14 @@ async function main() {
         const calcPct = (c, p) =>
           p ? parseFloat((((c - p) / p) * 100).toFixed(2)) : null;
         const fundImageData = await getFundImage(item.fundImage);
+        const oneYear = calcPct(currentPrice, price1Y);
+        const oneMonth = calcPct(currentPrice, price1M);
 
         results.push({
           fundName: item.fundName,
-          fundImage: item.fundImage ? `${config.dataUrl}/files/${fundImageData}` : null,
+          fundImage: item.fundImage
+            ? `${config.dataUrl}/files/${fundImageData}`
+            : null,
           assetClass: item.assetClass,
           currency: item.currency,
           yahooFinanceTicker: ticker,
@@ -82,8 +91,11 @@ async function main() {
           currencyDenomination: item.currencyDenomination,
           brokerAvailability: item.brokerAvailability,
           price: currentPrice,
-          oneYear: calcPct(currentPrice, price1Y),
-          oneMonth: calcPct(currentPrice, price1M),
+          oneYear: oneYear,
+          oneMonth: oneMonth,
+          oneYearGBPUSD: item.currency === "USD" ? calculateGbpUsdReturn(oneYear, gbpUsdReturn1Y) : null,
+          oneMonthGBPUSD: item.currency === "USD" ? calculateGbpUsdReturn(oneMonth, gbpUsdReturn1M) : null,
+          showInProd: item.showInProd,
           updatedAt: new Date().toISOString(),
         });
 
