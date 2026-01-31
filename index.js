@@ -6,7 +6,7 @@ import getHistoricalPrice from "./utils/getHistoricalPrice.js";
 import { config } from "./config.js";
 import getFundImage from "./utils/getFundImage.js";
 import calculateGbpUsdReturn from "./utils/calculateGbpUsdReturn.js";
-import getGbpUsdReturn from "./utils/getGBPUSDReturn.js";
+import getGbpUsdReturn from "./utils/getGbpUsdReturn.js";
 
 const yahooFinance = new YahooFinance({
   suppressNotices: ["yahooSurvey", "ripHistorical"],
@@ -93,8 +93,8 @@ async function main() {
           price: currentPrice,
           oneYear: oneYear,
           oneMonth: oneMonth,
-          oneYearGBPUSD: item.currency === "USD" ? calculateGbpUsdReturn(oneYear, gbpUsdReturn1Y) : null,
-          oneMonthGBPUSD: item.currency === "USD" ? calculateGbpUsdReturn(oneMonth, gbpUsdReturn1M) : null,
+          oneYearGBPUSD: item.currency === "USD" && item.oneYear !== null ? calculateGbpUsdReturn(oneYear, gbpUsdReturn1Y) : null,
+          oneMonthGBPUSD: item.currency === "USD" && item.oneMonth !== null ? calculateGbpUsdReturn(oneMonth, gbpUsdReturn1M) : null,
           showInProd: item.showInProd,
           updatedAt: new Date().toISOString(),
         });
